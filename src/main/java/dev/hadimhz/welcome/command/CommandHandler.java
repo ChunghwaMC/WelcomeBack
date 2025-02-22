@@ -23,10 +23,10 @@ public class CommandHandler implements CommandExecutor {
 
     private static boolean classExist(String className) {
 		try {
-			Class.forName(className);
-			return true;
+		    Class.forName(className);
+		    return true;
 		} catch (ClassNotFoundException e) {
-			return false;
+		    return false;
 		}
 	}
 
