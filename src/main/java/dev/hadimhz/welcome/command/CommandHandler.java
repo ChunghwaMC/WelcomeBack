@@ -19,6 +19,17 @@ public class CommandHandler implements CommandExecutor {
     private final PlayerListener listener;
     private final Config config;
 
+    private final boolean isFolia = classExist("io.papermc.paper.threadedregions.RegionizedServerInitEvent");
+
+    private static boolean classExist(String className) {
+		try {
+			Class.forName(className);
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
+	}
+
     public CommandHandler(Plugin plugin, PlayerListener listener, Config config) {
         this.plugin = plugin;
         this.listener = listener;
@@ -56,7 +67,11 @@ public class CommandHandler implements CommandExecutor {
             if (config.displayFirstXWelcomeMessages == -1 || listener.getWelcomed().size() < config.displayFirstXWelcomeMessages)
                 player.chat(config.firstJoin.get(random.nextInt(config.firstJoin.size())).replaceAll("%player%", listener.getPlayer().getName()));
 
-            for (String command : config.CommandsToExecuteOnFirstJoin) {
+            if(isFolia)
+                for (String command : config.CommandsToExecuteOnFirstJoin) {
+                    Bukkit.getGlobalRegionScheduler().run(plugin, run -> Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command.replaceAll("%player%", player.getName())));
+            }
+            else for (String command : config.CommandsToExecuteOnFirstJoin) {
                 Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command.replaceAll("%player%", player.getName()));
             }
 
@@ -64,7 +79,11 @@ public class CommandHandler implements CommandExecutor {
             if (config.displayFirstXWelcomeMessages == -1 || listener.getWelcomed().size() < config.displayFirstXWelcomeMessages)
                 player.chat(config.joinBack.get(random.nextInt(config.joinBack.size())).replaceAll("%player%", listener.getPlayer().getName()));
 
-            for (String command : config.commandsToExecute) {
+            if(isFolia)
+                for (String command : config.commandsToExecute) {
+                    Bukkit.getGlobalRegionScheduler().run(plugin, run -> Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command.replaceAll("%player%", player.getName())));
+            }
+            else for (String command : config.commandsToExecute) {
                 Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command.replaceAll("%player%", player.getName()));
             }
         }
